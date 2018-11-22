@@ -2,10 +2,10 @@ import logging
 import logging.config
 import json
 import sys
-#sys.path.append('/home/vchaska1/protobuf/protobuf-3.5.1/python')
+sys.path.append('/home/vchaska1/protobuf/protobuf-3.5.1/python')
 import os
 import socket
-#import bank_pb2
+import kv_pb2
 import random
 from random import randint
 import time
@@ -15,6 +15,7 @@ import struct
 channels = zip()
 br_name = ""
 branch_info = []
+BUFFER_SIZE = 1024
 
 def setup_logging(
         default_path='logging.json',
@@ -56,73 +57,81 @@ def parseFile(filename):
     except:
         logger.exception('Some Internal Error occured')
 
-def Create_InitBranch_Message(balance, branch_info):
-        logger.debug('Create_InitBranch_Message() entry')
-        branch_message = bank_pb2.BranchMessage()
-        init_branch = branch_message.init_branch
-        init_branch.balance = int(balance)
+def sendDataOverSocket(ip, port, message):
+    logger.debug('sendDataOverSocket() entry')
+    logger.debug('ip: %s port:%s message %s', ip, str(port), message)
 
-        for key, value in branch_info.items():
-            branch = init_branch.all_branches.add()
-            branch.name = key
-            branch.ip = value[0]
-            branch.port = int(value[1])
-           # logger.debug(f' balance: {balance} name:{key} ip:{value[0]} port:{value[1]}')
+    sock = socket.socket()
+    sock.connect((ip, int(port))) # Connect to branch and send message.
+    sock.sendall(message.SerializeToString()) # .encode('ascii')
+    data = sock.recv(BUFFER_SIZE) 
+    kv_message = kv_pb2.KVMessage()
+    logger.debug('Received Data is: %s', data)
 
-        logger.debug('InitBranch Message:%s',branch_message)
+    logger.debug('sendDataOverSocket() exit')
+    return kv_message.ParseFromString(data)
 
-        logger.debug('Create_InitBranch_Message() exit')
-        return branch_message
+def get_request(key, c_level):
+    # creating probuf based message here and returning to send over socket
+    logger.debug('get_request() entry')
+    logger.debug('Looking for key:%s, level: %s', key, c_level)
+    kv_message = kv_pb2.KVMessage()
+    get_request = kv_message.get_request
+    get_request.key = int(key)
+    get_request.consistency_level = int(c_level)
 
-def Create_InitSnapshot_Message(snapshot_id):
+    logger.debug('get_request() exit')
+    return kv_message
 
-        logger.debug('Create_Initsnapshot_Message() entry')
-        branch_message = bank_pb2.BranchMessage()
-        init_snapshot = branch_message.init_snapshot
-        init_snapshot.snapshot_id = snapshot_id
+def put_request(key, value, c_level):
+    # creating probuf based message here and returning to send over socket
+    logger.debug('put_request() entry')
+    logger.debug('Putting key:%s,  value: %s,  level: %s', key, value, c_level)
+    kv_message = kv_pb2.KVMessage()
+    put_request = kv_message.put_request
+    put_request.key = int(key)
+    put_request.value = value
+    put_request.consistency_level = int(c_level)
 
-        logger.debug('Snapshot id is: %d', snapshot_id)
+    logger.debug('put_request() exit')
+    return kv_message    
 
-        logger.debug('InitSnapshot Message:%s', branch_message)
+def parse_get_response(kv_message):
+    ## parsing the received response here and priting requested 'key', 'value' on console
+    logger.debug('parse_get_response() entry')
+    logger.debug(' get_response: %s', kv_message)
 
-        logger.debug('Create_Initsnapshot_Message() exit')
-        return branch_message
+    if kv_message.HasField('cord_response'):
+        cord_response_data = kv_message.cord_response
+        if 1 == cord_response_data.status: #print only if success else display error
+            print(' key: ' + str(cord_response_data.key))
+            print(' value: ' + cord_response_data.value)
+        else:
+            print('Some internal error occured.')
 
-def Create_RetrieveSnapshot_Message(snapshot_id):
+    logger.debug('parse_get_response() exit')
 
-        logger.debug('Create_RetrieveSnapshot_Message() entry')
-        branch_message = bank_pb2.BranchMessage()
-        retrieve_snapshot = branch_message.retrieve_snapshot
-        retrieve_snapshot.snapshot_id = snapshot_id
+def parse_put_response(kv_message):
+    ## parsing the received response here and priting requested 'key', 'value' on console
+    logger.debug('parse_put_response() entry')
+    logger.debug(' put_response: %s', kv_message)
 
-        logger.debug('Snapshot id is: %d', snapshot_id)
+    if kv_message.HasField('cord_response'):
+        cord_response_data = kv_message.cord_response
+        if 1 == cord_response_data.status: #print only if success else display error
+            print(' Successfully Entered..!!')
+        else:
+            print('Some internal error occured.')
 
-        logger.debug('RetrieveSnapshot Message: %s',branch_message)
-
-        logger.debug('Create_RetrieveSnapshot_Message) exit')
-        return branch_message
-
-def get_request():
-    print('get_reuqest')
-
-def put_request():
-    print('put_request')
-
-def get_response():
-    print('get_response')
-
-def put_response():
-    print('put_response')
-
+    logger.debug('parse_put_response() exit')
 
 def main():
     # Controller will parse the text file and fill branch info in local structure
     logger.debug('main() entry')
-    br_name = sys.argv[1]
 
     try:
         ## Create socket to send requests to 'branch'.
-       # sock = socket.socket()
+        # sock = socket.socket()
 
         if len(sys.argv)  != 3:
             logger.error('Invalid parameters Passed')
@@ -132,45 +141,56 @@ def main():
         ip = sys.argv[1]
         port = int(sys.argv[2])
 
-        print('Enter the action to perform:')
-        print('1. Get Key')
-        print('2. Put Key')
-        print('3. Exit')
-        choice = input()
-
-        if 1 == choice:
-            # call get routine
-            get_request()
-        elif 2 == choice:
-            # call put routine 
-            put_request()
-        elif 3 == choice:
-            exit(0)
-            # call exit routine here
-        else:
-            print('Invalid Choice. Exiting..!!')
-
-        ## Build messages get/put based on user input.
-
         while True:
-            sock = socket.socket()
-            sock.connect((ip, port)) 
-            sock.sendall(init_snapshot_msg.SerializeToString()) # .encode('ascii')?
-            data = sock.recv(1024)
-            sock.close()
 
-            # based on recived RESPONSE, functions will be called here.
-            
-            ## parse protobuf format
-            #branchMessage.ParseFromString(data)
-                
+            print('Enter the action to perform:')
+            print('1. Get Key ')
+            print('2. Put Key ')
+            print('3. Exit ')
+            choice = input()
+
+        #####  GET REQUEST
+            if 1 == int(choice):
+                # call get routine
+                print('Enter the key to search')
+                key = input()
+                print('Enter the CONSISTENCY LEVEL you would like.')
+                print('  1. ONE')
+                print('  2. QUORUM')
+                c_level = input()
+                req = get_request(key, c_level)
+                response = sendDataOverSocket(ip, port, req)
+                parse_get_response(response)
+
+        #####  PUT REQUEST
+
+            elif 2 == int(choice):
+                # call put routine 
+                print('Enter the key  ')
+                key = input()
+                print('Enter the value  ')
+                value = input()
+                print('Enter the CONSISTENCY LEVEL you would like. ')
+                print('  1. ONE')
+                print('  2. QUORUM')
+                c_level = input()
+                req = put_request(key, value, c_level)
+                response = sendDataOverSocket(ip, port, req)
+                parse_put_response(response)
+
+        ####  QUIT
+            elif 3 == int(choice):
+                exit(0)
+                # call exit routine here
+            else:
+                print('Invalid Choice. Exiting..!!')
+
+            ## Build messages get/put based on user input.
+
     except KeyboardInterrupt:
         logger.debug('Ctr + C is pressed exiting controller')
-        sock.close()
     finally:
-        sock.close()
         logger.debug('main() exit')
-
 
 # Main routine
 if __name__ == '__main__':

@@ -1,14 +1,14 @@
 syntax = "proto3";
 
 message PutRequest {
-    uint32 key = 2;
-    string value = 3;
-    uint32 consistency_level = 4; 
+    uint32 key = 1;
+    string value = 2;
+    uint32 consistency_level = 3; 
 }
 
 message GetRequest {
-    uint32 key = 2;
-    uint32 consistency_level = 3;
+    uint32 key = 1;
+    uint32 consistency_level = 2;
 }
 
 message CordResponse { 
@@ -26,21 +26,21 @@ message ReplicaResponse {
 }
 
 message ReplicaRequest {
-    uint32 key = 2;
-    string value = 3;
-    uint32 timestamp = 4;
+    uint32 key = 1;
+    string value = 2;
+    uint32 timestamp = 3;
 }
 
 message ReadRepair{
-    uint32 key = 2;
-    string value = 3;
-    uint32 timestamp = 4; 
+    uint32 key = 1;
+    string value = 2;
+    uint32 timestamp = 3; 
 }
 
 message HintedHandoff{
-    uint32 key = 2;
-    string value = 3;
-    uint32 timestamp = 4; 
+    uint32 key = 1;
+    string value = 2;
+    uint32 timestamp = 3; 
 }
 
 message KVMessage {

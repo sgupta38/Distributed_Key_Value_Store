@@ -10,12 +10,12 @@ import socket
 import threading
 import time
 import random
-#sys.path.append('/home/vchaska1/protobuf/protobuf-3.5.1/python')
-#import bank_pb2
+sys.path.append('/home/vchaska1/protobuf/protobuf-3.5.1/python')
+import kv_pb2
 from threading import Lock
 from pathlib import Path
 
-KV_FILE = "write-ahead.log"
+KV_FILE = "write-ahead.db"
 br_name = ""
 br_balance = 0
 br_list = []
@@ -230,11 +230,64 @@ if __name__ == '__main__':
     
     ### Once whole setup is done, load the 'write-ahead log file'
     InitializeKVStore()
+    logger.debug('Local Db is: %s', str(key_value_store))
+
 
     logger.debug('\nListening on %s:%s\n' % (str(ip), sys.argv[2]))
     print('\n Listening on ' + str(ip) + ' : '+ sys.argv[2])
     try:
         while True:
+            kv_message = kv_pb2.KVMessage()
+
+            client_conn, client_addr = server_socket.accept()
+            data = client_conn.recv(BUFFER_SIZE)  # dont print data directly, its binary
+            kv_message.ParseFromString(data)
+
+            logger.debug('Message Received is: %s', str(kv_message))
+
+            client_ip, client_port = client_conn.getsockname()
+            logger.debug("Connected from : %s:%s", client_ip, client_port)
+
+            if kv_message.HasField('get_request'):
+                logger.debug('get_request() entry')
+
+                get_request = kv_message.get_request
+                logger.debug('  requested key is: %d Consistency_level is: %d', get_request.key, get_request.consistency_level)
+                
+                ## Based on consistency level, read key and return value to client
+
+                ## todo: send response client based on protocol, preplica handling
+                value = key_value_store.get(str(get_request.key)) 
+                print('Value is: ' + value)
+
+                logger.debug('get_request() exit')
+
+            elif kv_message.HasField('put_request'):
+                logger.debug('put_request() entry')
+                ## Based on consistency level, insert key & value and return TRUE to client else FALSE
+                
+                put_request = kv_message.put_request
+                logger.debug('  key is: %d, value is: %d', put_request.key, put_request.value)
+
+                logger.debug('put_request() exit')
+
+            elif kv_message.HasField('replica_request'):
+                logger.debug('replica_request() entry')
+                ## This message came from 'Co-ordinator'. So get/put based on consistency level
+
+                logger.debug('replica_request() exit')
+
+            elif kv_message.HasField('replica_response'):
+                logger.debug('replica_response() entry')
+                ## This message came from 'REPLICA'. Based on consistency level criteria, return data to CLIENT.
+
+                logger.debug('replica_response() exit')
+
+            else:
+                print('Invalid Message received.')
+                logger.debug("Invalid Message received.")
+
+
             '''
             branchMessage = bank_pb2.BranchMessage()
             client_conn, client_addr = server_socket.accept()
