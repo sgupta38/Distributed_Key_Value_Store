@@ -1,0 +1,179 @@
+179 -2276 - 2018-11-20 14:06:57,073 - replica - DEBUG - Main() Entry
+58 -2276 - 2018-11-20 14:06:57,124 - replica - DEBUG - parseFile() entry
+74 -2276 - 2018-11-20 14:06:57,126 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -2276 - 2018-11-20 14:06:57,126 - replica - DEBUG - parseFile() exit
+179 -12676 - 2018-11-20 14:08:19,437 - replica - DEBUG - Main() Entry
+58 -12676 - 2018-11-20 14:08:19,495 - replica - DEBUG - parseFile() entry
+74 -12676 - 2018-11-20 14:08:19,498 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -12676 - 2018-11-20 14:08:19,505 - replica - DEBUG - parseFile() exit
+179 -17244 - 2018-11-20 14:08:46,700 - replica - DEBUG - Main() Entry
+58 -17244 - 2018-11-20 14:08:46,765 - replica - DEBUG - parseFile() entry
+74 -17244 - 2018-11-20 14:08:46,767 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -17244 - 2018-11-20 14:08:46,768 - replica - DEBUG - parseFile() exit
+179 -16660 - 2018-11-20 14:09:00,494 - replica - DEBUG - Main() Entry
+58 -16660 - 2018-11-20 14:09:00,538 - replica - DEBUG - parseFile() entry
+74 -16660 - 2018-11-20 14:09:00,539 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -16660 - 2018-11-20 14:09:00,539 - replica - DEBUG - parseFile() exit
+190 -16660 - 2018-11-20 14:09:00,540 - replica - DEBUG - Other replica info is: {}
+193 -16660 - 2018-11-20 14:09:00,540 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+179 -2028 - 2018-11-20 14:09:46,581 - replica - DEBUG - Main() Entry
+58 -2028 - 2018-11-20 14:09:46,666 - replica - DEBUG - parseFile() entry
+74 -2028 - 2018-11-20 14:09:46,667 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -2028 - 2018-11-20 14:09:46,667 - replica - DEBUG - parseFile() exit
+179 -504 - 2018-11-20 14:10:10,104 - replica - DEBUG - Main() Entry
+58 -504 - 2018-11-20 14:10:10,149 - replica - DEBUG - parseFile() entry
+74 -504 - 2018-11-20 14:10:10,151 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -504 - 2018-11-20 14:10:10,151 - replica - DEBUG - parseFile() exit
+191 -504 - 2018-11-20 14:10:10,152 - replica - DEBUG - Other replica info is: {}
+194 -504 - 2018-11-20 14:10:10,152 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+179 -12240 - 2018-11-20 14:10:50,760 - replica - DEBUG - Main() Entry
+58 -12240 - 2018-11-20 14:10:50,818 - replica - DEBUG - parseFile() entry
+74 -12240 - 2018-11-20 14:10:50,819 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -12240 - 2018-11-20 14:10:50,820 - replica - DEBUG - parseFile() exit
+191 -12240 - 2018-11-20 14:10:50,821 - replica - DEBUG - Other replica info is: {}
+194 -12240 - 2018-11-20 14:10:50,821 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+179 -14012 - 2018-11-20 14:11:01,817 - replica - DEBUG - Main() Entry
+58 -14012 - 2018-11-20 14:11:01,892 - replica - DEBUG - parseFile() entry
+74 -14012 - 2018-11-20 14:11:01,895 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -14012 - 2018-11-20 14:11:01,897 - replica - DEBUG - parseFile() exit
+191 -14012 - 2018-11-20 14:11:01,898 - replica - DEBUG - Other replica info is: {}
+194 -14012 - 2018-11-20 14:11:01,898 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+179 -10528 - 2018-11-20 14:11:39,859 - replica - DEBUG - Main() Entry
+58 -10528 - 2018-11-20 14:11:39,902 - replica - DEBUG - parseFile() entry
+74 -10528 - 2018-11-20 14:11:39,903 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -10528 - 2018-11-20 14:11:39,904 - replica - DEBUG - parseFile() exit
+191 -10528 - 2018-11-20 14:11:39,904 - replica - DEBUG - Other replica info is: {}
+194 -10528 - 2018-11-20 14:11:39,905 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+179 -16196 - 2018-11-20 14:15:04,260 - replica - DEBUG - Main() Entry
+58 -16196 - 2018-11-20 14:15:04,331 - replica - DEBUG - parseFile() entry
+74 -16196 - 2018-11-20 14:15:04,333 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -16196 - 2018-11-20 14:15:04,334 - replica - DEBUG - parseFile() exit
+190 -16196 - 2018-11-20 14:15:04,335 - replica - DEBUG - Other replica info is: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+191 -16196 - 2018-11-20 14:15:04,336 - replica - DEBUG - Original is: {}
+194 -16196 - 2018-11-20 14:15:04,336 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+179 -5772 - 2018-11-20 14:15:43,726 - replica - DEBUG - Main() Entry
+58 -5772 - 2018-11-20 14:15:43,778 - replica - DEBUG - parseFile() entry
+74 -5772 - 2018-11-20 14:15:43,781 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -5772 - 2018-11-20 14:15:43,781 - replica - DEBUG - parseFile() exit
+191 -5772 - 2018-11-20 14:15:43,781 - replica - DEBUG - Other replica info is: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+192 -5772 - 2018-11-20 14:15:43,783 - replica - DEBUG - Original is: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+195 -5772 - 2018-11-20 14:15:43,783 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+186 -10396 - 2018-11-20 14:22:32,072 - replica - DEBUG - Main() Entry
+58 -10396 - 2018-11-20 14:22:32,115 - replica - DEBUG - parseFile() entry
+74 -10396 - 2018-11-20 14:22:32,116 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -10396 - 2018-11-20 14:22:32,117 - replica - DEBUG - parseFile() exit
+197 -10396 - 2018-11-20 14:22:32,118 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+198 -10396 - 2018-11-20 14:22:32,118 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+186 -12072 - 2018-11-20 14:22:49,122 - replica - DEBUG - Main() Entry
+58 -12072 - 2018-11-20 14:22:49,193 - replica - DEBUG - parseFile() entry
+74 -12072 - 2018-11-20 14:22:49,195 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -12072 - 2018-11-20 14:22:49,196 - replica - DEBUG - parseFile() exit
+197 -12072 - 2018-11-20 14:22:49,196 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+198 -12072 - 2018-11-20 14:22:49,197 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+186 -9728 - 2018-11-20 14:23:44,992 - replica - DEBUG - Main() Entry
+58 -9728 - 2018-11-20 14:23:45,056 - replica - DEBUG - parseFile() entry
+74 -9728 - 2018-11-20 14:23:45,058 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+75 -9728 - 2018-11-20 14:23:45,059 - replica - DEBUG - parseFile() exit
+197 -9728 - 2018-11-20 14:23:45,059 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+198 -9728 - 2018-11-20 14:23:45,059 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+204 -9728 - 2018-11-20 14:23:45,060 - replica - DEBUG - 
+Listening on 128.226.114.203:9090
+
+190 -10408 - 2018-11-20 14:26:56,605 - replica - DEBUG - Main() Entry
+59 -10408 - 2018-11-20 14:26:56,656 - replica - DEBUG - parseFile() entry
+78 -10408 - 2018-11-20 14:26:56,658 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+79 -10408 - 2018-11-20 14:26:56,659 - replica - DEBUG - parseFile() exit
+201 -10408 - 2018-11-20 14:26:56,660 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+202 -10408 - 2018-11-20 14:26:56,660 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+210 -10408 - 2018-11-20 14:26:56,662 - replica - DEBUG - 
+Listening on 128.226.114.203:9090
+
+190 -5772 - 2018-11-20 14:27:09,427 - replica - DEBUG - Main() Entry
+59 -5772 - 2018-11-20 14:27:09,498 - replica - DEBUG - parseFile() entry
+78 -5772 - 2018-11-20 14:27:09,500 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+79 -5772 - 2018-11-20 14:27:09,501 - replica - DEBUG - parseFile() exit
+201 -5772 - 2018-11-20 14:27:09,501 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+202 -5772 - 2018-11-20 14:27:09,503 - replica - DEBUG - Local Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica4': ['128.226.114.204', '9093']}
+210 -5772 - 2018-11-20 14:27:09,504 - replica - DEBUG - 
+Listening on 128.226.114.203:9090
+
+179 -3740 - 2018-11-20 14:42:01,506 - replica - DEBUG - Main() Entry
+59 -3740 - 2018-11-20 14:42:01,561 - replica - DEBUG - parseFile() entry
+86 -3740 - 2018-11-20 14:42:01,563 - replica - ERROR - Some Internal Error occured
+Traceback (most recent call last):
+  File "replica.py", line 77, in parseFile
+    ip_port = values[i+1] +':'+str(values[i+2])
+IndexError: list index out of range
+180 -15112 - 2018-11-20 14:44:26,384 - replica - DEBUG - Main() Entry
+59 -15112 - 2018-11-20 14:44:26,429 - replica - DEBUG - parseFile() entry
+87 -15112 - 2018-11-20 14:44:26,430 - replica - ERROR - Some Internal Error occured
+Traceback (most recent call last):
+  File "replica.py", line 65, in parseFile
+    print('values are: ' + values)
+TypeError: can only concatenate str (not "list") to str
+180 -6092 - 2018-11-20 14:44:44,916 - replica - DEBUG - Main() Entry
+59 -6092 - 2018-11-20 14:44:44,967 - replica - DEBUG - parseFile() entry
+87 -6092 - 2018-11-20 14:44:44,968 - replica - ERROR - Some Internal Error occured
+Traceback (most recent call last):
+  File "replica.py", line 78, in parseFile
+    ip_port = values[i+1] +':'+str(values[i+2])
+IndexError: list index out of range
+183 -8888 - 2018-11-20 14:46:21,679 - replica - DEBUG - Main() Entry
+59 -8888 - 2018-11-20 14:46:21,726 - replica - DEBUG - parseFile() entry
+85 -8888 - 2018-11-20 14:46:21,727 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+86 -8888 - 2018-11-20 14:46:21,728 - replica - DEBUG - parseFile() exit
+194 -8888 - 2018-11-20 14:46:21,728 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+195 -8888 - 2018-11-20 14:46:21,729 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+197 -8888 - 2018-11-20 14:46:21,729 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+185 -17520 - 2018-11-20 15:01:39,162 - replica - DEBUG - Main() Entry
+63 -17520 - 2018-11-20 15:01:39,192 - replica - DEBUG - parseFile() entry
+87 -17520 - 2018-11-20 15:01:39,193 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+88 -17520 - 2018-11-20 15:01:39,193 - replica - DEBUG - parseFile() exit
+196 -17520 - 2018-11-20 15:01:39,193 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+197 -17520 - 2018-11-20 15:01:39,193 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+208 -17520 - 2018-11-20 15:01:39,194 - replica - DEBUG - KV file does not exists. Creating..
+212 -17520 - 2018-11-20 15:01:39,196 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+185 -18076 - 2018-11-20 15:02:49,018 - replica - DEBUG - Main() Entry
+63 -18076 - 2018-11-20 15:02:49,045 - replica - DEBUG - parseFile() entry
+87 -18076 - 2018-11-20 15:02:49,046 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+88 -18076 - 2018-11-20 15:02:49,046 - replica - DEBUG - parseFile() exit
+196 -18076 - 2018-11-20 15:02:49,046 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+197 -18076 - 2018-11-20 15:02:49,046 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+203 -18076 - 2018-11-20 15:02:49,047 - replica - DEBUG - KV file exists
+207 -18076 - 2018-11-20 15:02:49,054 - replica - DEBUG - Previous KV store was : {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+213 -18076 - 2018-11-20 15:02:49,054 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+
+220 -15836 - 2018-11-20 15:10:00,932 - replica - DEBUG - Main() Entry
+104 -15836 - 2018-11-20 15:10:00,960 - replica - DEBUG - InitializeDataStructures() entry
+63 -15836 - 2018-11-20 15:10:00,960 - replica - DEBUG - parseFile() entry
+87 -15836 - 2018-11-20 15:10:00,961 - replica - DEBUG - Replica Dictionary:{'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+88 -15836 - 2018-11-20 15:10:00,962 - replica - DEBUG - parseFile() exit
+109 -15836 - 2018-11-20 15:10:00,962 - replica - DEBUG - All Replica info: {'replica1': ['128.226.114.201', '9090'], 'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+110 -15836 - 2018-11-20 15:10:00,963 - replica - DEBUG - Local Replica info: {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+112 -15836 - 2018-11-20 15:10:00,963 - replica - DEBUG - InitializeDataStructures() exit
+118 -15836 - 2018-11-20 15:10:00,963 - replica - DEBUG - InitializeKVStore() entry
+123 -15836 - 2018-11-20 15:10:00,964 - replica - DEBUG - KV file exists
+127 -15836 - 2018-11-20 15:10:00,964 - replica - DEBUG - Previous KV store was : {'replica2': ['128.226.114.202', '9091'], 'replica3': ['128.226.114.203', '9092'], 'replica4': ['128.226.114.204', '9093']}
+133 -15836 - 2018-11-20 15:10:00,965 - replica - DEBUG - InitializeKVStore() exit
+233 -15836 - 2018-11-20 15:10:00,965 - replica - DEBUG - 
+Listening on 192.168.1.14:9090
+

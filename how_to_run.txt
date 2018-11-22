@@ -1,0 +1,12 @@
+=== Replica ===
+
+py replica.py replica1 9090 branches.txt
+
+python KVCoordinator.py nodename PORTNUM replicas.txt READ-REPAIR
+python KVCoordinator.py nodename PORTNUM replicas.txt HINTED-HANDOFF
+
+== client ===
+
+f the client wants to select a node running on 128.226.180.167 and port 9090 as its co-ordinator
+
+python KVclient.py  128.226.180.167 9090

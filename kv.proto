@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+message PutRequest {
+    uint32 key = 2;
+    string value = 3;
+    uint32 consistency_level = 4; 
+}
+
+message GetRequest {
+    uint32 key = 2;
+    uint32 consistency_level = 3;
+}
+
+message CordResponse { 
+    uint32 id = 1;
+    uint32 key = 2;
+    bool status = 3;        
+    string value = 4;        
+}
+
+message ReplicaResponse {
+    uint32 id = 1;
+    uint32 key = 2;
+    string value = 3;
+    uint32 timestamp = 4;    // unix timestamp;. String okay? Or int32 or int64?
+}
+
+message ReplicaRequest {
+    uint32 key = 2;
+    string value = 3;
+    uint32 timestamp = 4;
+}
+
+message ReadRepair{
+    uint32 key = 2;
+    string value = 3;
+    uint32 timestamp = 4; 
+}
+
+message HintedHandoff{
+    uint32 key = 2;
+    string value = 3;
+    uint32 timestamp = 4; 
+}
+
+message KVMessage {
+  oneof kv_message {
+    PutRequest put_request = 1;
+    GetRequest get_request = 2;
+    CordResponse cord_response = 3;
+    ReplicaRequest replica_request = 4;
+    ReplicaResponse replica_response = 5;
+  }
+}

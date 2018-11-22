@@ -158,6 +158,8 @@ def main():
             sock.sendall(init_snapshot_msg.SerializeToString()) # .encode('ascii')?
             data = sock.recv(1024)
             sock.close()
+
+            # based on recived RESPONSE, functions will be called here.
             
             ## parse protobuf format
             #branchMessage.ParseFromString(data)
