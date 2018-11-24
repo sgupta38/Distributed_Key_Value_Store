@@ -10,3 +10,6 @@ python KVCoordinator.py nodename PORTNUM replicas.txt HINTED-HANDOFF
 f the client wants to select a node running on 128.226.180.167 and port 9090 as its co-ordinator
 
 python KVclient.py  128.226.180.167 9090
+
+export PATH=/home/vchaska1/protobuf/bin:$PATH
+export PKG_CONFIG_PATH=/home/vchaska1/protobuf/lib/pkgconfig

@@ -1,3 +1,7 @@
+'''
+    @Author: Sonu Gupta
+    @Purpose: This file acts as a 'Client'
+'''
 import logging
 import logging.config
 import json
@@ -66,7 +70,25 @@ def sendDataOverSocket(ip, port, message):
     sock.sendall(message.SerializeToString()) # .encode('ascii')
     data = sock.recv(BUFFER_SIZE) 
     kv_message = kv_pb2.KVMessage()
-    logger.debug('Received Data is: %s', data)
+    kv_message.ParseFromString(data)
+    logger.debug('Received KV is: %s', kv_message)
+
+    ## Since, co-ordinator will response either True or False and based on that client will just print
+    ## o/p on console
+    if kv_message.HasField('cord_response'):
+        ## check status 
+        if kv_message.cord_response.status is True:
+            print('=====================================================================')
+            print('Operation Successfully Completed....!!!')
+            print(' Key: ' + str(kv_message.cord_response.key))
+            print(' Value: ' + kv_message.cord_response.value)
+            print('=====================================================================')
+            print()
+        else:
+            print('=====================================================================')
+            print("Error: Either Key is not Valid or Some error in writing key to DB.")
+            print('=====================================================================')
+
 
     logger.debug('sendDataOverSocket() exit')
     return kv_message.ParseFromString(data)
@@ -95,7 +117,7 @@ def put_request(key, value, c_level):
 
     logger.debug('put_request() exit')
     return kv_message    
-
+'''
 def parse_get_response(kv_message):
     ## parsing the received response here and priting requested 'key', 'value' on console
     logger.debug('parse_get_response() entry')
@@ -124,7 +146,7 @@ def parse_put_response(kv_message):
             print('Some internal error occured.')
 
     logger.debug('parse_put_response() exit')
-
+'''
 def main():
     # Controller will parse the text file and fill branch info in local structure
     logger.debug('main() entry')
@@ -152,31 +174,45 @@ def main():
         #####  GET REQUEST
             if 1 == int(choice):
                 # call get routine
-                print('Enter the key to search')
-                key = input()
-                print('Enter the CONSISTENCY LEVEL you would like.')
-                print('  1. ONE')
-                print('  2. QUORUM')
-                c_level = input()
-                req = get_request(key, c_level)
-                response = sendDataOverSocket(ip, port, req)
-                parse_get_response(response)
+                try:
+                    print('Enter the key to search')
+                    key = input()
+                    if 0<=int(key)<=255:
+                        print('Enter the CONSISTENCY LEVEL you would like.')
+                        print('  1. ONE')
+                        print('  2. QUORUM')
+                        c_level = input()
+                        req = get_request(key, c_level)
+                        response = sendDataOverSocket(ip, port, req)
+                    else:
+                        print('Key if Out-of Range. Please Enter between range 0-255')
+                except ValueError:
+                    print('Error: Please Enter Valid \'Integer Value\' ')
+                except:
+                    print('Error: Internal Error Occured')
 
         #####  PUT REQUEST
 
             elif 2 == int(choice):
                 # call put routine 
-                print('Enter the key  ')
-                key = input()
-                print('Enter the value  ')
-                value = input()
-                print('Enter the CONSISTENCY LEVEL you would like. ')
-                print('  1. ONE')
-                print('  2. QUORUM')
-                c_level = input()
-                req = put_request(key, value, c_level)
-                response = sendDataOverSocket(ip, port, req)
-                parse_put_response(response)
+                try:
+                    print('Enter the key  ')
+                    key = input()
+                    if 0<=int(key)<=255:
+                        print('Enter the value  ')
+                        value = input()
+                        print('Enter the CONSISTENCY LEVEL you would like. ')
+                        print('  1. ONE')
+                        print('  2. QUORUM')
+                        c_level = input()
+                        req = put_request(key, value, c_level)
+                        response = sendDataOverSocket(ip, port, req)
+                    else:
+                        print('Key if Out-of Range. Please Enter between range 0-255')
+                except ValueError:
+                    print('Error: Please Enter Valid \'Integer Value\' ')
+                except:
+                    print('Error: Internal Error Occured')
 
         ####  QUIT
             elif 3 == int(choice):
