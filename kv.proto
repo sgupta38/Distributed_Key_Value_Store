@@ -24,13 +24,19 @@ message ReplicaResponse {
     uint32 id = 1;
     uint32 key = 2;
     string value = 3;
-    double timestamp = 4;    // unix timestamp;. String okay? Or int32 or int64?
+    bool status = 4;        
+    double timestamp = 5;    // unix timestamp;. String okay? Or int32 or int64?
 }
 
 message ReplicaRequest {
     uint32 key = 1;
     string value = 2;
     double timestamp = 3;
+    uint32 operation = 4;    // 0--> Read, 1-->Write
+}
+
+message ErrorMessage {
+    string msg = 1;
 }
 
 message ReadRepair{
@@ -52,5 +58,6 @@ message KVMessage {
     CordResponse cord_response = 3;
     ReplicaRequest replica_request = 4;
     ReplicaResponse replica_response = 5;
+    ErrorMessage error_message = 6;
   }
 }
