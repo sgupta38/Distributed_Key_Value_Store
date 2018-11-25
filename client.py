@@ -89,6 +89,10 @@ def sendDataOverSocket(ip, port, message):
             print("Error: Either Key is not Valid or Some error in writing key to DB.")
             print('=====================================================================')
 
+    elif kv_message.HasField('error_message'):
+            print('=====================================================================')
+            print("Error: Some SERVERS are DOWN. Please try again later")
+            print('=====================================================================')
 
     logger.debug('sendDataOverSocket() exit')
     return kv_message.ParseFromString(data)
