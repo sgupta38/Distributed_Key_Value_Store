@@ -9,7 +9,8 @@ message PutRequest {
 message GetRequest {
     uint32 key = 1;
     uint32 consistency_level = 2;
-    uint32 timestamp = 3;
+    string value = 3;
+    double timestamp = 4;
 }
 
 message CordResponse { 

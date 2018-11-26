@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='kv.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x08kv.proto\"C\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x19\n\x11\x63onsistency_level\x18\x03 \x01(\r\"G\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\x19\n\x11\x63onsistency_level\x18\x02 \x01(\r\x12\x11\n\ttimestamp\x18\x03 \x01(\r\"Y\n\x0c\x43ordResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\x0e\n\x06status\x18\x03 \x01(\x08\x12\r\n\x05value\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"\\\n\x0fReplicaResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x0e\n\x06status\x18\x04 \x01(\x08\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"R\n\x0eReplicaRequest\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\x12\x11\n\toperation\x18\x04 \x01(\r\"\x1b\n\x0c\x45rrorMessage\x12\x0b\n\x03msg\x18\x01 \x01(\t\";\n\nReadRepair\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\">\n\rHintedHandoff\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\"\x8b\x02\n\tKVMessage\x12\"\n\x0bput_request\x18\x01 \x01(\x0b\x32\x0b.PutRequestH\x00\x12\"\n\x0bget_request\x18\x02 \x01(\x0b\x32\x0b.GetRequestH\x00\x12&\n\rcord_response\x18\x03 \x01(\x0b\x32\r.CordResponseH\x00\x12*\n\x0freplica_request\x18\x04 \x01(\x0b\x32\x0f.ReplicaRequestH\x00\x12,\n\x10replica_response\x18\x05 \x01(\x0b\x32\x10.ReplicaResponseH\x00\x12&\n\rerror_message\x18\x06 \x01(\x0b\x32\r.ErrorMessageH\x00\x42\x0c\n\nkv_messageb\x06proto3')
+  serialized_pb=_b('\n\x08kv.proto\"C\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x19\n\x11\x63onsistency_level\x18\x03 \x01(\r\"V\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\x19\n\x11\x63onsistency_level\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x11\n\ttimestamp\x18\x04 \x01(\x01\"Y\n\x0c\x43ordResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\x0e\n\x06status\x18\x03 \x01(\x08\x12\r\n\x05value\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"\\\n\x0fReplicaResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x0e\n\x06status\x18\x04 \x01(\x08\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"R\n\x0eReplicaRequest\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\x12\x11\n\toperation\x18\x04 \x01(\r\"\x1b\n\x0c\x45rrorMessage\x12\x0b\n\x03msg\x18\x01 \x01(\t\";\n\nReadRepair\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\">\n\rHintedHandoff\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\"\x8b\x02\n\tKVMessage\x12\"\n\x0bput_request\x18\x01 \x01(\x0b\x32\x0b.PutRequestH\x00\x12\"\n\x0bget_request\x18\x02 \x01(\x0b\x32\x0b.GetRequestH\x00\x12&\n\rcord_response\x18\x03 \x01(\x0b\x32\r.CordResponseH\x00\x12*\n\x0freplica_request\x18\x04 \x01(\x0b\x32\x0f.ReplicaRequestH\x00\x12,\n\x10replica_response\x18\x05 \x01(\x0b\x32\x10.ReplicaResponseH\x00\x12&\n\rerror_message\x18\x06 \x01(\x0b\x32\r.ErrorMessageH\x00\x42\x0c\n\nkv_messageb\x06proto3')
 )
 
 
@@ -92,9 +92,16 @@ _GETREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='timestamp', full_name='GetRequest.timestamp', index=2,
-      number=3, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
+      name='value', full_name='GetRequest.value', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='timestamp', full_name='GetRequest.timestamp', index=3,
+      number=4, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -111,7 +118,7 @@ _GETREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=81,
-  serialized_end=152,
+  serialized_end=167,
 )
 
 
@@ -169,8 +176,8 @@ _CORDRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=154,
-  serialized_end=243,
+  serialized_start=169,
+  serialized_end=258,
 )
 
 
@@ -228,8 +235,8 @@ _REPLICARESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=245,
-  serialized_end=337,
+  serialized_start=260,
+  serialized_end=352,
 )
 
 
@@ -280,8 +287,8 @@ _REPLICAREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=339,
-  serialized_end=421,
+  serialized_start=354,
+  serialized_end=436,
 )
 
 
@@ -311,8 +318,8 @@ _ERRORMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=423,
-  serialized_end=450,
+  serialized_start=438,
+  serialized_end=465,
 )
 
 
@@ -356,8 +363,8 @@ _READREPAIR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=452,
-  serialized_end=511,
+  serialized_start=467,
+  serialized_end=526,
 )
 
 
@@ -401,8 +408,8 @@ _HINTEDHANDOFF = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=513,
-  serialized_end=575,
+  serialized_start=528,
+  serialized_end=590,
 )
 
 
@@ -470,8 +477,8 @@ _KVMESSAGE = _descriptor.Descriptor(
       name='kv_message', full_name='KVMessage.kv_message',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=578,
-  serialized_end=845,
+  serialized_start=593,
+  serialized_end=860,
 )
 
 _KVMESSAGE.fields_by_name['put_request'].message_type = _PUTREQUEST
