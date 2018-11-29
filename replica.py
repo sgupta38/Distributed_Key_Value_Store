@@ -41,6 +41,9 @@ GET = 0
 PUT = 1
 CONSISTENCY_LEVEL_QUORUM = 2
 CONSISTENCY_LEVEL_ONE = 1
+READ_REPAIR = 1
+HINTED_HANDOFF = 2
+configuration = 0
 
 def setup_logging(
     default_path='logging.json',
@@ -135,6 +138,7 @@ def InitializeKVStore():
             logger.debug("KV file does not exists. Creating..")
             open(KV_FILE, 'w')
             key_value_store = {}
+            s = f.write(str(key_value_store))
     except SyntaxError:
         logger.error('Please DELETE old DB file.')
         print('Error: Please DELETE old DB file.')
@@ -195,8 +199,10 @@ def AmIReplica(partioner_ring):
     logger.debug('ID is: %s partioner_ring is: %s', ID, str(partioner_ring))
 
     if ID in partioner_ring:
+        logger.debug('ID belongs to partioner_ring')
         return True
     else:
+        logger.debug('ID DOES NOT belongs to partioner_ring')
         return False
     
 def getReplicaName(ip, port):
@@ -231,9 +237,18 @@ def update_key_value_store(key, value, p_timestamp, ROLE):
         '''
         write_timestamp = p_timestamp
 
-
         try:
-            key_value_store[str(key)] = [value, write_timestamp]
+            ## If key doesnt exist, add it.
+            if str(key) not in key_value_store:
+                logger.debug('key does not exist, adding it')
+                key_value_store[str(key)] = [value, write_timestamp]
+            else:
+                ## update a key only when its present timestamp is less than timestamp of the update.
+                logger.debug('old timestamp(%f), new timestamp(%f)', key_value_store[str(key)][1], p_timestamp)
+
+                if  key_value_store[str(key)][1] < write_timestamp:
+                    key_value_store[str(key)] = [value, write_timestamp]
+
             ## Write to write-ahead file
             f = open(KV_FILE, "w")
             f.write(str(key_value_store))
@@ -287,18 +302,23 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
     global read_counter
     global hinted_list
     global timestamp
+    global configuration
+    logger.debug('eventually_update_replicas() entry')
 
     kvlist_of_tuple = []
 
     ## @todo: DO i need to add 'own' details here?
     if op_type == GET:
-        my_data = key_value_store[str(request.key)]
-        kvlist_of_tuple = [tuple((getCurentReplicaID(), request.key, my_data[0], my_data[1]))]
+
+        ## before getting, check if I belong here or not
+        if AmIReplica(partioner_list):
+            if str(request.key) in key_value_store:
+                my_data = key_value_store[str(request.key)]
+                kvlist_of_tuple = [tuple((getCurentReplicaID(), request.key, my_data[0], my_data[1]))]
 
     hinted_list = []
 
     try:
-        logger.debug('eventually_update_replicas() entry')
         logger.debug(' parms: partioner_list: %s, op_type = %s, approach = %s, request = %s ', str(partioner_list), str(op_type), str(approach), request)
 
         ## Preparing protobuf resonse structure
@@ -336,9 +356,12 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                      sock.close()
                      # Add id to failed node list
                      hinted_list.append(ID)
+
+                     ## @todo: during RR shall i add this to kvlist??
+                     ## kvlist_of_tuple.append(tuple((ID, 0, 0, 0)))       ### Just add the blank details with proper ID
                      continue
 
-                ## Here, parse the 'Resonse' received from REPLICA. Know whether success/false.
+                ## Here, parse the 'Response' received from REPLICA. Know whether success/false.
                 response_from_replica = kv_pb2.KVMessage()
                 response_from_replica.ParseFromString(data)
 
@@ -360,12 +383,14 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                                 send_ack_to_client(client_conn, request)
                         
                         elif op_type == GET:
+
                             read_counter = read_counter + 1
 
                             ## Read response and store it in tuple. For 'QUORUM', we need to return recent value based on time stamp
                             kvlist_of_tuple.append(tuple((ID, replica_response.key, replica_response.value, replica_response.timestamp)))
 
                             if read_counter == 1 and approach == CONSISTENCY_LEVEL_ONE:          # co-rdinator != replica [by client]
+                                request.value = replica_response.value
                                 send_ack_to_client(client_conn, request)
 
                             ''' 
@@ -383,10 +408,10 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                                 ## @workaround: here, 'request' aka. getrequest has no 'value'. We need struct with 'value' here.
                                 request.key = key
                                 request.value = value
-                                logger.debug('LAtest value: %s', request)
+                                logger.debug('Latest value: %s', request)
                                 send_ack_to_client(client_conn, request)
 
-                    else:           # Replica has failed to update so inc failed_list
+                    else: # Replica has failed to update so inc failed_list. Since, that replica doesnt had KEY, it replid with FALSE status.
                         hinted_list.append(ID)
 
                 sock.close()
@@ -403,13 +428,16 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                 send_errmsg_to_client(client_conn, 'Exception: Not Enough Replica Available')
 
             ## Read Repair Done here
-            repair_failed_replicas(kvlist_of_tuple)
+            if configuration == READ_REPAIR:
+                logger.debug('READ-REPAIR enabled, repairing the replicas')
+                repair_failed_replicas(kvlist_of_tuple)
 
     except KeyError:
         logger.error('Invalid Replica Name. Please check replicas.txt')
     except:
         logger.exception('Some Internal Error occured')
 
+    logger.debug('Configuration type: %d', configuration)
     logger.debug('Final writer_count: %d', write_counter)
     logger.debug('Final read_count: %d', read_counter)
     logger.debug('HH list: %s', str( list( set(hinted_list)) ) )   ## @todo:Since this is global list, fire this to read-repair function and reset it.
@@ -418,6 +446,9 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
 
 def repair_failed_replicas(kvlist_of_tuple):
     logger.debug('repair_failed_replicas() entry')
+
+    ## While repair, making sure we UPDATE with latest timestamp value.
+    kvlist_of_tuple.sort(key=operator.itemgetter(3), reverse=True) # sort in ascending
 
     failed_list = []
     key = kvlist_of_tuple[0][1]
@@ -479,17 +510,24 @@ def  handle_ONE_approach(client_conn, request, op_type):
     logger.debug('Ring is: %s', str(partioner_list))
 
     #check whether current node/Co-ordinator is one of the replcias?
-    if AmIReplica(partioner_list):
+    value = AmIReplica(partioner_list)
+    if value is True:
         if op_type == PUT:     # Write operation
             write_counter = write_counter + 1
             update_key_value_store(request.key, request.value, timestamp, CO_ORDINATOR) #Its co-ordinator who is updating
         elif op_type == GET:   # Read operation
-            read_counter = read_counter + 1
-
-        # For ONE, send ACK to client
-        send_ack_to_client(client_conn, request)
-        ## Remove its ID from partioner List.
-        partioner_list.remove(getCurentReplicaID())
+            ### Check whether key exists or not
+            if str(request.key) not in key_value_store:
+                logger.debug('Checking key existence')
+                send_errmsg_to_client(client_conn, 'Key Does not exist')
+                return False
+            else:
+                read_counter = read_counter + 1
+                request.value = key_value_store[str(request.key)][0] ## Fill value here, so client can display
+                # For ONE, send ACK to client
+                send_ack_to_client(client_conn, request)
+                ## Remove its ID from partioner List.
+                partioner_list.remove(getCurentReplicaID())
 
     # Here, partioner list will definitely not have 'this' ID, Because, if it was 'this', it has already done its work
     # and has removed itself from 'partioner_list'
@@ -514,7 +552,12 @@ def handle_QUORUM_approach(client_conn, request, op_type): # QUORUM
             write_counter = write_counter + 1
             update_key_value_store(request.key, request.value, timestamp, CO_ORDINATOR)
         elif op_type == GET:
-            read_counter = read_counter + 1
+            ### Check whether key exists or not
+            if str(request.key) not in key_value_store:
+                send_errmsg_to_client(client_conn, 'Key Does not exist')
+                return False
+            else:
+                read_counter = read_counter + 1
 
         ## Remove its ID from partioner List.
         partioner_list.remove(getCurentReplicaID())
@@ -538,6 +581,19 @@ if __name__ == '__main__':
     server_socket.bind((ip, int(sys.argv[2])))
     server_socket.listen(5)
     my_name = sys.argv[1]
+
+    ### setting configuration type:
+    if sys.argv[4] == 'READ-REPAIR':
+        configuration = READ_REPAIR
+        logger.debug('Configuration Type is: READ_REPAIR ')    
+    elif sys.argv[4] == 'HINTED-HANDOFF':
+        configuration = HINTED_HANDOFF
+        logger.debug('Configuration Type is: HINTED_HANDOFF')    
+    else:
+        logger.debug('Invalid Configuration Type : ')
+        print(' Please select appropriate Configuration Type')
+        sock.close()
+        sys.exit(0)
 
     ###
     InitializeDataStructures()
