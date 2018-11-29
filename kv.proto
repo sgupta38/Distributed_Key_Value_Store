@@ -1,16 +1,18 @@
 syntax = "proto3";
 
 message PutRequest {
-    uint32 key = 1;
-    string value = 2;
-    uint32 consistency_level = 3; 
+    uint32 id = 1;
+    uint32 key = 2;
+    string value = 3;
+    uint32 consistency_level = 4; 
 }
 
 message GetRequest {
-    uint32 key = 1;
-    uint32 consistency_level = 2;
-    string value = 3;
-    double timestamp = 4;
+    uint32 id = 1;
+    uint32 key = 2;
+    uint32 consistency_level = 3;
+    string value = 4;
+    double timestamp = 5;
 }
 
 message CordResponse { 
@@ -27,13 +29,15 @@ message ReplicaResponse {
     string value = 3;
     bool status = 4;        
     double timestamp = 5;    // unix timestamp;. String okay? Or int32 or int64?
+    repeated ReplicaRequest hinted_handoff = 6;
 }
 
 message ReplicaRequest {
-    uint32 key = 1;
-    string value = 2;
-    double timestamp = 3;
-    uint32 operation = 4;    // 0--> Read, 1-->Write
+    uint32 id = 1;
+    uint32 key = 2;
+    string value = 3;
+    double timestamp = 4;
+    uint32 operation = 5;    // 0--> Read, 1-->Write
 }
 
 message ErrorMessage {
