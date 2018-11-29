@@ -44,6 +44,7 @@ CONSISTENCY_LEVEL_ONE = 1
 READ_REPAIR = 1
 HINTED_HANDOFF = 2
 configuration = 0
+hint_dict = {}
 
 def setup_logging(
     default_path='logging.json',
@@ -162,6 +163,17 @@ def getCurentReplicaID():
     logger.debug('getCurentReplicaID() exit')
     return ID[0]
 
+def getReplicaIDFromName(r_name):
+    logger.debug('getReplicaIDFromName() entry')
+
+    s = [r_name]
+    ID = re.findall('\d+', s[0])
+
+    logger.debug('ID is: %s', ID[0])
+
+    logger.debug('getReplicaIDFromName() exit')
+    return ID[0]
+
 def getReplicNameFromID(ID):
     logger.debug('getReplicNameFromID() entry')
 
@@ -221,33 +233,30 @@ def getReplicaName(ip, port):
 
     logger.debug('getReplicaName() exit')
 
-def update_key_value_store(key, value, p_timestamp, ROLE):
+def update_key_value_store(key, value, p_timestamp):
         global key_value_store
         global KV_FILE
         global timestamp
         
         logger.debug('update_key_value_store() entry')
 
-        #todo: add try catch
-        ## Here, we need to insert the key into DB and then convey it to other replicas.
-        '''
-        if ROLE == CO_ORDINATOR:
-            write_timestamp = time.time()
-        elif ROLE == REPLICA:
-        '''
         write_timestamp = p_timestamp
 
         try:
             ## If key doesnt exist, add it.
             if str(key) not in key_value_store:
                 logger.debug('key does not exist, adding it')
+                lock.acquire()
                 key_value_store[str(key)] = [value, write_timestamp]
+                lock.release()
             else:
                 ## update a key only when its present timestamp is less than timestamp of the update.
                 logger.debug('old timestamp(%f), new timestamp(%f)', key_value_store[str(key)][1], p_timestamp)
 
                 if  key_value_store[str(key)][1] < write_timestamp:
+                    lock.acquire()
                     key_value_store[str(key)] = [value, write_timestamp]
+                    lock.release()
 
             ## Write to write-ahead file
             f = open(KV_FILE, "w")
@@ -303,6 +312,7 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
     global hinted_list
     global timestamp
     global configuration
+    global hint_dict
     logger.debug('eventually_update_replicas() entry')
 
     kvlist_of_tuple = []
@@ -325,6 +335,7 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
         response_kv_message = kv_pb2.KVMessage()
         replica_request = response_kv_message.replica_request
         replica_request.key = request.key
+        replica_request.id = request.id
 
         if op_type == PUT:
             replica_request.value = request.value
@@ -352,28 +363,41 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                     sock.sendall(response_kv_message.SerializeToString()) # .encode('ascii')
                     data = sock.recv(BUFFER_SIZE) 
                 except:
-                     logger.error('Error while connecting. Trying next to connect next replica')
-                     sock.close()
-                     # Add id to failed node list
-                     hinted_list.append(ID)
+                    logger.error('Error while connecting. Trying next to connect next replica')
+                    sock.close()
+                    # Add id to failed node list
+                    hinted_list.append(ID)
 
-                     ## @todo: during RR shall i add this to kvlist??
-                     ## kvlist_of_tuple.append(tuple((ID, 0, 0, 0)))       ### Just add the blank details with proper ID
-                     continue
+                    ## add key, value,ts to hint_dict[id], only if its PUT/Write
+                    if op_type == PUT and configuration == HINTED_HANDOFF:
+                        hint_dict[ID].append(tuple((request.key, request.value, timestamp)))
+                        logger.debug('hint is: %s', str(hint_dict))
+
+                    ## @todo: during RR shall i add this to kvlist??
+                    ## kvlist_of_tuple.append(tuple((ID, 0, 0, 0)))       ### Just add the blank details with proper ID
+                    continue
 
                 ## Here, parse the 'Response' received from REPLICA. Know whether success/false.
                 response_from_replica = kv_pb2.KVMessage()
                 response_from_replica.ParseFromString(data)
 
-                logger.debug('Replica response is: %s', response_from_replica)
+                logger.debug('Replica response is: %s', response_from_replica)                
 
                 if response_from_replica.HasField('replica_response'):
                     replica_response = response_from_replica.replica_response
+
+                    if configuration == HINTED_HANDOFF:
+                        ## Before Doing anything, first store all 'hints'
+                        for hinted_handoff in replica_response.hinted_handoff:
+                            logger.debug('Received HINT from %s', getReplicNameFromID(hinted_handoff.id))
+                            logger.debug('kv = [%d, %s, %f]', hinted_handoff.key, hinted_handoff.value, hinted_handoff.timestamp)
+                            update_key_value_store(hinted_handoff.key, hinted_handoff.value, hinted_handoff.timestamp)
 
                     ## Only care about 'STATUS' Here.
                     if replica_response.status is True:                # Replica successfully updated
 
                         if op_type == PUT:
+                            
                             write_counter = write_counter + 1
                             
                             ## If write_counter is greater than 2 and its QUORUM based approach
@@ -412,7 +436,7 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                                 send_ack_to_client(client_conn, request)
 
                     else: # Replica has failed to update so inc failed_list. Since, that replica doesnt had KEY, it replid with FALSE status.
-                        hinted_list.append(ID)
+                        hinted_list.append(ID) ## It means replica has no key. @discuss
 
                 sock.close()
 
@@ -442,6 +466,7 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
     logger.debug('Final read_count: %d', read_counter)
     logger.debug('HH list: %s', str( list( set(hinted_list)) ) )   ## @todo:Since this is global list, fire this to read-repair function and reset it.
     logger.debug('kvlist_of_tuple: %s', str(kvlist_of_tuple))
+    logger.debug('hint dict: %s', str(hint_dict))
     logger.debug('eventually_update_replicas() exit')
 
 def repair_failed_replicas(kvlist_of_tuple):
@@ -475,6 +500,7 @@ def perform_read_repair(failed_list, key, value, timestamp):
     ## Prepare Read-Repair 'Request' Message here.
     RR_request = kv_pb2.KVMessage()
     replica_request = RR_request.replica_request
+    replica_request.id = int(getCurentReplicaID())
     replica_request.key = key
     replica_request.value = value
     replica_request.timestamp = timestamp
@@ -514,7 +540,7 @@ def  handle_ONE_approach(client_conn, request, op_type):
     if value is True:
         if op_type == PUT:     # Write operation
             write_counter = write_counter + 1
-            update_key_value_store(request.key, request.value, timestamp, CO_ORDINATOR) #Its co-ordinator who is updating
+            update_key_value_store(request.key, request.value, timestamp) #Its co-ordinator who is updating
         elif op_type == GET:   # Read operation
             ### Check whether key exists or not
             if str(request.key) not in key_value_store:
@@ -524,10 +550,11 @@ def  handle_ONE_approach(client_conn, request, op_type):
             else:
                 read_counter = read_counter + 1
                 request.value = key_value_store[str(request.key)][0] ## Fill value here, so client can display
-                # For ONE, send ACK to client
-                send_ack_to_client(client_conn, request)
-                ## Remove its ID from partioner List.
-                partioner_list.remove(getCurentReplicaID())
+
+        # For ONE, send ACK to client
+        send_ack_to_client(client_conn, request)
+        ## Remove its ID from partioner List.
+        partioner_list.remove(getCurentReplicaID())
 
     # Here, partioner list will definitely not have 'this' ID, Because, if it was 'this', it has already done its work
     # and has removed itself from 'partioner_list'
@@ -550,14 +577,10 @@ def handle_QUORUM_approach(client_conn, request, op_type): # QUORUM
     if AmIReplica(partioner_list):
         if op_type == PUT:
             write_counter = write_counter + 1
-            update_key_value_store(request.key, request.value, timestamp, CO_ORDINATOR)
+            update_key_value_store(request.key, request.value, timestamp)
         elif op_type == GET:
             ### Check whether key exists or not
-            if str(request.key) not in key_value_store:
-                send_errmsg_to_client(client_conn, 'Key Does not exist')
-                return False
-            else:
-                read_counter = read_counter + 1
+            read_counter = read_counter + 1
 
         ## Remove its ID from partioner List.
         partioner_list.remove(getCurentReplicaID())
@@ -582,6 +605,7 @@ if __name__ == '__main__':
     server_socket.listen(5)
     my_name = sys.argv[1]
 
+
     ### setting configuration type:
     if sys.argv[4] == 'READ-REPAIR':
         configuration = READ_REPAIR
@@ -605,6 +629,12 @@ if __name__ == '__main__':
     InitializeKVStore()
     logger.debug('Local Db is: %s', str(key_value_store))
 
+    ########## creating the hint_dictionary data structure  ####
+    for key in other_replicas_dict.keys():
+        hint_dict[getReplicaIDFromName(key)] = []
+
+    logger.debug('Initially blank, hint_list: %s', str(hint_dict))
+
     logger.debug('\nListening on %s:%s\n', str(ip), sys.argv[2])
     print('\n Listening on ' + str(ip) + ' : '+ sys.argv[2])
     try:
@@ -625,6 +655,7 @@ if __name__ == '__main__':
 
                 read_counter = 0
                 get_request = kv_message.get_request
+                get_request.id = int(getCurentReplicaID())
                 logger.debug('  requested key is: %d Consistency_level is: %d', get_request.key, get_request.consistency_level)
                 
                 ## Based on consistency level, read key and return value to client
@@ -650,6 +681,7 @@ if __name__ == '__main__':
                 ## Based on consistency level, insert key & value and return TRUE to client else FALSE
                 
                 put_request = kv_message.put_request
+                put_request.id = int(getCurentReplicaID())
                 logger.debug('  key is: %d, value is: %s', put_request.key, put_request.value)
                 
                 ## Before directly updating, first check whether 'this' is in partioner list or not
@@ -663,7 +695,12 @@ if __name__ == '__main__':
                 logger.debug('put_request() exit')
 
             elif kv_message.HasField('replica_request'):
+                global hint_dict
                 logger.debug('replica_request() entry')
+
+                logger.debug('Hint dictionary : %s',str(hint_dict)) 
+
+                current_id =  int(getCurentReplicaID())
 
                 ## This message came from 'Co-ordinator'. So get/put based on consistency level
                 replica_request = kv_message.replica_request
@@ -671,7 +708,30 @@ if __name__ == '__main__':
                 ## create response
                 replica_response_message = kv_pb2.KVMessage()
                 replica_response = replica_response_message.replica_response
-                replica_response.id = int(getCurentReplicaID())
+                replica_response.id = current_id
+
+                if configuration == HINTED_HANDOFF:
+                    #########################################################
+
+                    # For hinted-handoff, first check whether given id exists in hint dict
+                    # if present, prepare hinted_message and send along with replica_response message
+
+                    #########################################################
+
+                    ## if id ID in dictionary, iterate all the fields and keep adding messages
+                    if str(replica_request.id) in hint_dict:
+                        logger.debug('Hint Exists for : %s', getReplicNameFromID(replica_request.id))
+
+                        stale_data_list = hint_dict.get(str(replica_request.id))
+                        ## Fill the protobuf based on stale_list
+
+                        for data in stale_data_list:
+                            logger.debug('kvt = %s', str(data)), 
+
+                            hh_message = replica_response.hinted_handoff.add()
+                            hh_message.id = current_id
+                            hh_message.operation = PUT
+                            hh_message.key, hh_message.value, hh_message.timestamp = data # tuples will be extracted here
 
                 if 0 == replica_request.operation:              # READ
                     logger.debug('READ request')
@@ -690,7 +750,7 @@ if __name__ == '__main__':
                     logger.debug('WRITE request')
                     ## Preparing protobuf resonse structure
                     replica_response.key = replica_request.key
-                    if True == update_key_value_store(replica_request.key, replica_request.value, replica_request.timestamp, REPLICA):
+                    if True == update_key_value_store(replica_request.key, replica_request.value, replica_request.timestamp):
                         replica_response.status = True
                     else:
                         replica_response.status = False
@@ -698,6 +758,13 @@ if __name__ == '__main__':
                 client_conn.sendall(replica_response_message.SerializeToString())
                 logger.debug('Replica --> co-ordinator: %s', replica_response_message)
 
+                ## Since, message is sent. Delete hints here.
+                ## if id ID in dictionary, iterate all the fields and keep adding messages
+                if str(replica_request.id) in hint_dict:
+                    logger.debug('Restting hint dict, since previous data sent:')
+                    hint_dict[str(replica_request.id)] = []
+
+                logger.debug('hint dict after submission is: %s', str(hint_dict))
                 logger.debug('replica_request() exit')
             else:
                 print('Invalid Message received.')
