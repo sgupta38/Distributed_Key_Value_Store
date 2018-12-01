@@ -242,33 +242,40 @@ def update_key_value_store(key, value, p_timestamp):
 
         write_timestamp = p_timestamp
 
-        try:
-            ## If key doesnt exist, add it.
-            if str(key) not in key_value_store:
-                logger.debug('key does not exist, adding it')
-                lock.acquire()
-                key_value_store[str(key)] = [value, write_timestamp]
-                lock.release()
-            else:
-                ## update a key only when its present timestamp is less than timestamp of the update.
-                logger.debug('old timestamp(%f), new timestamp(%f)', key_value_store[str(key)][1], p_timestamp)
+        ### key will only be added if it belongs to partioner_list.
+        partioner_list = getReplicaList(key)
+        does_key_belong_here = AmIReplica(partioner_list)
 
-                if  key_value_store[str(key)][1] < write_timestamp:
+        logger.debug('Does %d belong in partioner_list: %s ', does_key_belong_here, key)
+        if does_key_belong_here:
+            try:
+                ## If key doesnt exist, add it.
+                if str(key) not in key_value_store:
+                    logger.debug('key does not exist, adding it')
                     lock.acquire()
                     key_value_store[str(key)] = [value, write_timestamp]
                     lock.release()
+                else:
+                    ## update a key only when its present timestamp is less than timestamp of the update.
+                    logger.debug('old timestamp(%f), new timestamp(%f)', key_value_store[str(key)][1], p_timestamp)
 
-            ## Write to write-ahead file
-            f = open(KV_FILE, "w")
-            f.write(str(key_value_store))
-            f.close()
-        except:
-            logger.exception('Some Internal Error occured')
-            return False
+                    if  key_value_store[str(key)][1] < write_timestamp:
+                        lock.acquire()
+                        key_value_store[str(key)] = [value, write_timestamp]
+                        lock.release()
 
-        logger.debug('Write timestamp is: %f', write_timestamp)
+                ## Write to write-ahead file
+                f = open(KV_FILE, "w")
+                f.write(str(key_value_store))
+                f.close()
+            except:
+                logger.exception('Some Internal Error occured')
+                return False
+            logger.debug('Write timestamp is: %f', write_timestamp)
+        else:
+            logger.debug('Doing Nothing.')
+
         logger.debug('update_key_value_store() exit')
-
         return True
 
 def send_ack_to_client(client_conn, request):
@@ -316,15 +323,20 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
     logger.debug('eventually_update_replicas() entry')
 
     kvlist_of_tuple = []
+    absence_count = 0
 
     ## @todo: DO i need to add 'own' details here?
     if op_type == GET:
-
         ## before getting, check if I belong here or not
+        logger.debug('I hold key, so adding myself.')
         if AmIReplica(partioner_list):
             if str(request.key) in key_value_store:
                 my_data = key_value_store[str(request.key)]
-                kvlist_of_tuple = [tuple((getCurentReplicaID(), request.key, my_data[0], my_data[1]))]
+                my_id = getCurentReplicaID()
+                kvlist_of_tuple.append(tuple((my_id, request.key, my_data[0], my_data[1])))
+                logger.debug('kvlist_of_tuple is: %s', str(kvlist_of_tuple))
+            else:
+                absence_count = absence_count + 1
 
     hinted_list = []
 
@@ -355,13 +367,16 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                 port = replica_info[1]
 
                 logger.debug('Connecting to %s ip:%s port:%s', replica_name, ip, port)
+                logger.debug('co-ord --> replic: %s', str(response_kv_message))
+
 
                 ## Connect to respective replica 
                 try:
                     sock = socket.socket()
                     sock.connect((ip, int(port))) # Connect to branch and send message.
                     sock.sendall(response_kv_message.SerializeToString()) # .encode('ascii')
-                    data = sock.recv(BUFFER_SIZE) 
+                    data = sock.recv(BUFFER_SIZE)
+                    sock.close()
                 except:
                     logger.error('Error while connecting. Trying next to connect next replica')
                     sock.close()
@@ -373,8 +388,6 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                         hint_dict[ID].append(tuple((request.key, request.value, timestamp)))
                         logger.debug('hint is: %s', str(hint_dict))
 
-                    ## @todo: during RR shall i add this to kvlist??
-                    ## kvlist_of_tuple.append(tuple((ID, 0, 0, 0)))       ### Just add the blank details with proper ID
                     continue
 
                 ## Here, parse the 'Response' received from REPLICA. Know whether success/false.
@@ -399,9 +412,13 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                         if op_type == PUT:
                             
                             write_counter = write_counter + 1
+                            logger.debug('Incremented write_counter. value: %d', write_counter)
                             
                             ## If write_counter is greater than 2 and its QUORUM based approach
                             if write_counter >= 2 and approach == CONSISTENCY_LEVEL_QUORUM:
+
+                                # First update local key-store and then convey it to other replicas.
+                                update_key_value_store(request.key, request.value, timestamp) #Its co-ordinator who is updating
                                 send_ack_to_client(client_conn, request)
                             elif write_counter == 1 and approach == CONSISTENCY_LEVEL_ONE:          # co-rdinator != replica [by client]
                                 send_ack_to_client(client_conn, request)
@@ -409,6 +426,7 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                         elif op_type == GET:
 
                             read_counter = read_counter + 1
+                            logger.debug('Incremented write_counter. value: %d', read_counter)
 
                             ## Read response and store it in tuple. For 'QUORUM', we need to return recent value based on time stamp
                             kvlist_of_tuple.append(tuple((ID, replica_response.key, replica_response.value, replica_response.timestamp)))
@@ -417,42 +435,53 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                                 request.value = replica_response.value
                                 send_ack_to_client(client_conn, request)
 
-                            ''' 
-                                For a read request with consistency level QUORUM, the coordinator will return the most recent
-                                data from two replicas
-                            '''
-                            if read_counter == 2 and approach == CONSISTENCY_LEVEL_QUORUM:
-
-                                # sort the tuple based on time stamp and return the latest value.
-                                replica_id, key, value, timestamp = get_most_recent_kv(kvlist_of_tuple)
-
-                                logger.debug('replica_id: %s, key: %d, value: %s, timestamp: %f', replica_id, key, value, timestamp)
-
-                                ## Based on 'latest' timestamp, modify request and send it to client
-                                ## @workaround: here, 'request' aka. getrequest has no 'value'. We need struct with 'value' here.
-                                request.key = key
-                                request.value = value
-                                logger.debug('Latest value: %s', request)
-                                send_ack_to_client(client_conn, request)
-
                     else: # Replica has failed to update so inc failed_list. Since, that replica doesnt had KEY, it replid with FALSE status.
-                        hinted_list.append(ID) ## It means replica has no key. @discuss
+                        logger.debug('Replica is ALIVE. But, Dont have that key.')
 
-                sock.close()
+                        ### In case of READ just update the counter.
+                        if op_type == GET:
+                            read_counter = read_counter + 1
+                            absence_count = absence_count + 1
+                        
+                        hinted_list.append(ID) ## It means replica has no key. @discuss
+                        kvlist_of_tuple.append(tuple((ID, replica_response.key, replica_response.value, replica_response.timestamp)))
 
         ## SPECIAL CASE: After all attempts--QUORUM and Hinted off is selected
         if op_type == PUT:
             if approach == CONSISTENCY_LEVEL_QUORUM and write_counter < 2 :
                 logger.debug('QUORUM rules are not satisfied')
+                ## If Quorum rule is not satisfied, we should not store any 'hints'
+                 # Thus 
                 send_errmsg_to_client(client_conn, 'Exception: Not Enough Replica Available')
 
         if op_type == GET:
+
             if approach == CONSISTENCY_LEVEL_QUORUM and read_counter < 2:
                 logger.debug('QUORUM rules are not satisfied')
-                send_errmsg_to_client(client_conn, 'Exception: Not Enough Replica Available')
+                send_errmsg_to_client(client_conn, 'Error: Not Enough Replica Available')
+
+            ''' 
+                For a read request with consistency level QUORUM, the coordinator will return the most recent
+                data from two replicas
+            '''
+            if read_counter >= 2 and approach == CONSISTENCY_LEVEL_QUORUM:
+
+                if absence_count == 3:
+                    logger.debug('EXISTENCE COUNT: %d', absence_count)
+                    send_errmsg_to_client(client_conn, 'Error: Key is NOT present')
+                else:
+                    # sort the tuple based on time stamp and return the latest value.
+                    replica_id, key, value, timestamp = get_most_recent_kv(kvlist_of_tuple)
+                    logger.debug('replica_id: %s, key: %d, value: %s, timestamp: %f', replica_id, key, value, timestamp)
+
+                    ## Based on 'latest' timestamp, modify request and send it to client
+                    request.key = key
+                    request.value = value
+                    logger.debug('Latest value: %s', request)
+                    send_ack_to_client(client_conn, request)
 
             ## Read Repair Done here
-            if configuration == READ_REPAIR:
+            if configuration == READ_REPAIR and absence_count < 3:
                 logger.debug('READ-REPAIR enabled, repairing the replicas')
                 repair_failed_replicas(kvlist_of_tuple)
 
@@ -472,15 +501,17 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
 def repair_failed_replicas(kvlist_of_tuple):
     logger.debug('repair_failed_replicas() entry')
 
+    logger.debug('Before Sort: kvlist_of_tuple: %s', str(kvlist_of_tuple))
     ## While repair, making sure we UPDATE with latest timestamp value.
     kvlist_of_tuple.sort(key=operator.itemgetter(3), reverse=True) # sort in ascending
+    logger.debug('After Sort: kvlist_of_tuple: %s', str(kvlist_of_tuple))
 
     failed_list = []
     key = kvlist_of_tuple[0][1]
     latest_value = kvlist_of_tuple[0][2]
     latest_timestamp = kvlist_of_tuple[0][3]
 
-    logger.debug('latest key: %s, value: %s, timestamp: %f', str(key), latest_value, timestamp)
+    logger.debug('latest key: %s, value: %s, timestamp: %f', str(key), latest_value, latest_timestamp)
 
     i = 1
     while i != len(kvlist_of_tuple):
@@ -554,7 +585,7 @@ def  handle_ONE_approach(client_conn, request, op_type):
         # For ONE, send ACK to client
         send_ack_to_client(client_conn, request)
         ## Remove its ID from partioner List.
-        partioner_list.remove(getCurentReplicaID())
+        #partioner_list.remove(getCurentReplicaID())
 
     # Here, partioner list will definitely not have 'this' ID, Because, if it was 'this', it has already done its work
     # and has removed itself from 'partioner_list'
@@ -576,16 +607,59 @@ def handle_QUORUM_approach(client_conn, request, op_type): # QUORUM
     # @note: For 'QUORUM' based approach, we are not sending 'ACK' to client immediately.
     if AmIReplica(partioner_list):
         if op_type == PUT:
-            write_counter = write_counter + 1
-            update_key_value_store(request.key, request.value, timestamp)
+            write_counter = write_counter + 1  # just increment counter here. Actual KV store will be updated if 'quorum criteria satisfies'
         elif op_type == GET:
             ### Check whether key exists or not
             read_counter = read_counter + 1
 
         ## Remove its ID from partioner List.
-        partioner_list.remove(getCurentReplicaID())
+        #partioner_list.remove(getCurentReplicaID())
 
-    eventually_update_replicas(client_conn, partioner_list, request, CONSISTENCY_LEVEL_QUORUM, op_type)
+    ##  'QUORUM' based approach follows 'All' or 'Nothing' principle.
+    ##
+    ##  If 2/3 replicas are not available, It will just reply client with 'Error' message.
+    heartbeat_kv_message = kv_pb2.KVMessage()
+    heart_beat = heartbeat_kv_message.heart_beat
+    heart_beat.status = True  #dummy data. We dont care
+
+   # initial replica count. Since, co-ordinator can act as one of the 'Replica', setting it to writer/read count
+    if op_type == PUT:
+        replica_availability = write_counter
+    elif op_type == GET:
+        replica_availability = read_counter
+
+    logger.debug('HEART-BEAT checkup')
+
+    for ID in partioner_list:
+        if ID != getCurentReplicaID():
+            replica_name = getReplicNameFromID(ID)
+            replica_info = replica_dict[replica_name]
+            ip = replica_info[0]
+            port = replica_info[1]
+
+            logger.debug('Connecting to %s ip:%s port:%s', replica_name, ip, port)
+
+            ## Connect to respective replica 
+            try:
+                sock = socket.socket()
+                sock.connect((ip, int(port))) # Connect to branch and send message.
+                sock.sendall(heart_beat.SerializeToString()) # .encode('ascii')
+                sock.close()
+                replica_availability = replica_availability + 1
+            except:
+                logger.error('Error while connecting. Trying next to connect next replica')
+                sock.close()
+                ## Failure connect replica means its not 'Alive'. Thus, simply remove from partioner_list.
+                #partioner_list.remove(ID)
+                continue
+
+    if replica_availability >= 2:
+        logger.debug('Available partioner_list() is: %s', str(partioner_list))
+        eventually_update_replicas(client_conn, partioner_list, request, CONSISTENCY_LEVEL_QUORUM, op_type)
+    else:
+        logger.debug('Quorum Criteria Not Satisfied. Replica available = %d', replica_availability)
+        send_errmsg_to_client(client_conn, 'Exception: Not Enough Replica Available')
+
     logger.debug('handle_QUORUM_approach() exit')
 
 if __name__ == '__main__':
@@ -766,6 +840,20 @@ if __name__ == '__main__':
 
                 logger.debug('hint dict after submission is: %s', str(hint_dict))
                 logger.debug('replica_request() exit')
+            elif kv_message.HasField('display_kvstore'):
+                logger.debug('display_kvstore entry()')
+
+                print('==============================================================')
+                print(' ')
+                print('KV Store: ')
+                print('{')
+                for key in key_value_store:
+                    print( ' ' + key + ':' + str(key_value_store[key]))
+                print('}')
+                print(' ')
+                print('==============================================================')
+
+                logger.debug('display_kvstore exit()')
             else:
                 print('Invalid Message received.')
                 logger.debug("Invalid Message received.")

@@ -20,6 +20,8 @@ channels = zip()
 br_name = ""
 branch_info = []
 BUFFER_SIZE = 1024
+branch_dict = {}
+REPLICA_FILE = 'replicas.txt'
 
 def setup_logging(
         default_path='logging.json',
@@ -40,6 +42,7 @@ def setup_logging(
 def parseFile(filename):
     logger.debug('parseFile() entry')
     global branch_info
+    global branch_dict
     try:
         branch_dict = {}
         branch_info = []
@@ -91,7 +94,7 @@ def sendDataOverSocket(ip, port, message):
 
     elif kv_message.HasField('error_message'):
             print('=====================================================================')
-            print("Error: Some SERVERS are DOWN. Please try again later")
+            print("Error:" + str(kv_message.error_message.msg))
             print('=====================================================================')
 
     logger.debug('sendDataOverSocket() exit')
@@ -121,36 +124,18 @@ def put_request(key, value, c_level):
 
     logger.debug('put_request() exit')
     return kv_message    
-'''
-def parse_get_response(kv_message):
-    ## parsing the received response here and priting requested 'key', 'value' on console
-    logger.debug('parse_get_response() entry')
-    logger.debug(' get_response: %s', kv_message)
 
-    if kv_message.HasField('cord_response'):
-        cord_response_data = kv_message.cord_response
-        if 1 == cord_response_data.status: #print only if success else display error
-            print(' key: ' + str(cord_response_data.key))
-            print(' value: ' + cord_response_data.value)
-        else:
-            print('Some internal error occured.')
+def display_kv_store():
+    logger.debug('display_kv_store() entry')
 
-    logger.debug('parse_get_response() exit')
+    kv_message = kv_pb2.KVMessage()
+    display_request = kv_message.display_kvstore
+    display_request.status = True
 
-def parse_put_response(kv_message):
-    ## parsing the received response here and priting requested 'key', 'value' on console
-    logger.debug('parse_put_response() entry')
-    logger.debug(' put_response: %s', kv_message)
+    logger.debug('display_kv_store() exit')
+    return kv_message
 
-    if kv_message.HasField('cord_response'):
-        cord_response_data = kv_message.cord_response
-        if 1 == cord_response_data.status: #print only if success else display error
-            print(' Successfully Entered..!!')
-        else:
-            print('Some internal error occured.')
 
-    logger.debug('parse_put_response() exit')
-'''
 def main():
     # Controller will parse the text file and fill branch info in local structure
     logger.debug('main() entry')
@@ -163,6 +148,12 @@ def main():
             logger.error('Invalid parameters Passed')
             print('Invalid parameters passed.')
 
+        ## parse file
+        replica_dict =  parseFile(REPLICA_FILE)
+
+        ## Display all entity involved here.
+        logger.debug('Node info: %s', str(branch_dict))
+
         ## Extract co-ordinators ip-port here.
         ip = sys.argv[1]
         port = int(sys.argv[2])
@@ -172,7 +163,8 @@ def main():
             print('Enter the action to perform:')
             print('1. Get Key ')
             print('2. Put Key ')
-            print('3. Exit ')
+            print('3. Display ')
+            print('4. Exit ')
             choice = input()
 
         #####  GET REQUEST
@@ -218,8 +210,25 @@ def main():
                 except:
                     print('Error: Internal Error Occured')
 
-        ####  QUIT
             elif 3 == int(choice):
+                # call put routine 
+                req = display_kv_store()
+                logger.debug('Sending Msg: %s', str(req))
+                # request all replcas for showing the data.
+                for key in branch_dict:
+                    info = branch_dict[key]
+                    try:
+                        sock = socket.socket()
+                        sock.connect((info[0], int(info[1]))) # Connect to branch and send message.
+                        sock.sendall(req.SerializeToString()) # .encode('ascii')
+                        sock.close()
+                    except:
+                        logger.error('Connection Error. Connecting to next client')
+                        sock.close()
+                        continue
+
+        ####  QUIT
+            elif 4 == int(choice):
                 exit(0)
                 # call exit routine here
             else:

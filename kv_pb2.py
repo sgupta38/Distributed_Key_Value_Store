@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='kv.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x08kv.proto\"O\n\nPutRequest\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x19\n\x11\x63onsistency_level\x18\x04 \x01(\r\"b\n\nGetRequest\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\x19\n\x11\x63onsistency_level\x18\x03 \x01(\r\x12\r\n\x05value\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"Y\n\x0c\x43ordResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\x0e\n\x06status\x18\x03 \x01(\x08\x12\r\n\x05value\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"\x85\x01\n\x0fReplicaResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x0e\n\x06status\x18\x04 \x01(\x08\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\x12\'\n\x0ehinted_handoff\x18\x06 \x03(\x0b\x32\x0f.ReplicaRequest\"^\n\x0eReplicaRequest\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x11\n\ttimestamp\x18\x04 \x01(\x01\x12\x11\n\toperation\x18\x05 \x01(\r\"\x1b\n\x0c\x45rrorMessage\x12\x0b\n\x03msg\x18\x01 \x01(\t\";\n\nReadRepair\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\">\n\rHintedHandoff\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\"\x8b\x02\n\tKVMessage\x12\"\n\x0bput_request\x18\x01 \x01(\x0b\x32\x0b.PutRequestH\x00\x12\"\n\x0bget_request\x18\x02 \x01(\x0b\x32\x0b.GetRequestH\x00\x12&\n\rcord_response\x18\x03 \x01(\x0b\x32\r.CordResponseH\x00\x12*\n\x0freplica_request\x18\x04 \x01(\x0b\x32\x0f.ReplicaRequestH\x00\x12,\n\x10replica_response\x18\x05 \x01(\x0b\x32\x10.ReplicaResponseH\x00\x12&\n\rerror_message\x18\x06 \x01(\x0b\x32\r.ErrorMessageH\x00\x42\x0c\n\nkv_messageb\x06proto3')
+  serialized_pb=_b('\n\x08kv.proto\"O\n\nPutRequest\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x19\n\x11\x63onsistency_level\x18\x04 \x01(\r\"b\n\nGetRequest\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\x19\n\x11\x63onsistency_level\x18\x03 \x01(\r\x12\r\n\x05value\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"Y\n\x0c\x43ordResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\x0e\n\x06status\x18\x03 \x01(\x08\x12\r\n\x05value\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\"\x85\x01\n\x0fReplicaResponse\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x0e\n\x06status\x18\x04 \x01(\x08\x12\x11\n\ttimestamp\x18\x05 \x01(\x01\x12\'\n\x0ehinted_handoff\x18\x06 \x03(\x0b\x32\x0f.ReplicaRequest\"^\n\x0eReplicaRequest\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0b\n\x03key\x18\x02 \x01(\r\x12\r\n\x05value\x18\x03 \x01(\t\x12\x11\n\ttimestamp\x18\x04 \x01(\x01\x12\x11\n\toperation\x18\x05 \x01(\r\"\x1b\n\x0c\x45rrorMessage\x12\x0b\n\x03msg\x18\x01 \x01(\t\";\n\nReadRepair\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\">\n\rHintedHandoff\x12\x0b\n\x03key\x18\x01 \x01(\r\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x01\"\x1b\n\tDisplayKV\x12\x0e\n\x06status\x18\x01 \x01(\x08\"\x1b\n\tHeartBeat\x12\x0e\n\x06status\x18\x01 \x01(\x08\"\xd4\x02\n\tKVMessage\x12\"\n\x0bput_request\x18\x01 \x01(\x0b\x32\x0b.PutRequestH\x00\x12\"\n\x0bget_request\x18\x02 \x01(\x0b\x32\x0b.GetRequestH\x00\x12&\n\rcord_response\x18\x03 \x01(\x0b\x32\r.CordResponseH\x00\x12*\n\x0freplica_request\x18\x04 \x01(\x0b\x32\x0f.ReplicaRequestH\x00\x12,\n\x10replica_response\x18\x05 \x01(\x0b\x32\x10.ReplicaResponseH\x00\x12&\n\rerror_message\x18\x06 \x01(\x0b\x32\r.ErrorMessageH\x00\x12%\n\x0f\x64isplay_kvstore\x18\x07 \x01(\x0b\x32\n.DisplayKVH\x00\x12 \n\nheart_beat\x18\x08 \x01(\x0b\x32\n.HeartBeatH\x00\x42\x0c\n\nkv_messageb\x06proto3')
 )
 
 
@@ -441,6 +441,68 @@ _HINTEDHANDOFF = _descriptor.Descriptor(
 )
 
 
+_DISPLAYKV = _descriptor.Descriptor(
+  name='DisplayKV',
+  full_name='DisplayKV',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='status', full_name='DisplayKV.status', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=670,
+  serialized_end=697,
+)
+
+
+_HEARTBEAT = _descriptor.Descriptor(
+  name='HeartBeat',
+  full_name='HeartBeat',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='status', full_name='HeartBeat.status', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=699,
+  serialized_end=726,
+)
+
+
 _KVMESSAGE = _descriptor.Descriptor(
   name='KVMessage',
   full_name='KVMessage',
@@ -490,6 +552,20 @@ _KVMESSAGE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='display_kvstore', full_name='KVMessage.display_kvstore', index=6,
+      number=7, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='heart_beat', full_name='KVMessage.heart_beat', index=7,
+      number=8, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -505,8 +581,8 @@ _KVMESSAGE = _descriptor.Descriptor(
       name='kv_message', full_name='KVMessage.kv_message',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=671,
-  serialized_end=938,
+  serialized_start=729,
+  serialized_end=1069,
 )
 
 _REPLICARESPONSE.fields_by_name['hinted_handoff'].message_type = _REPLICAREQUEST
@@ -516,6 +592,8 @@ _KVMESSAGE.fields_by_name['cord_response'].message_type = _CORDRESPONSE
 _KVMESSAGE.fields_by_name['replica_request'].message_type = _REPLICAREQUEST
 _KVMESSAGE.fields_by_name['replica_response'].message_type = _REPLICARESPONSE
 _KVMESSAGE.fields_by_name['error_message'].message_type = _ERRORMESSAGE
+_KVMESSAGE.fields_by_name['display_kvstore'].message_type = _DISPLAYKV
+_KVMESSAGE.fields_by_name['heart_beat'].message_type = _HEARTBEAT
 _KVMESSAGE.oneofs_by_name['kv_message'].fields.append(
   _KVMESSAGE.fields_by_name['put_request'])
 _KVMESSAGE.fields_by_name['put_request'].containing_oneof = _KVMESSAGE.oneofs_by_name['kv_message']
@@ -534,6 +612,12 @@ _KVMESSAGE.fields_by_name['replica_response'].containing_oneof = _KVMESSAGE.oneo
 _KVMESSAGE.oneofs_by_name['kv_message'].fields.append(
   _KVMESSAGE.fields_by_name['error_message'])
 _KVMESSAGE.fields_by_name['error_message'].containing_oneof = _KVMESSAGE.oneofs_by_name['kv_message']
+_KVMESSAGE.oneofs_by_name['kv_message'].fields.append(
+  _KVMESSAGE.fields_by_name['display_kvstore'])
+_KVMESSAGE.fields_by_name['display_kvstore'].containing_oneof = _KVMESSAGE.oneofs_by_name['kv_message']
+_KVMESSAGE.oneofs_by_name['kv_message'].fields.append(
+  _KVMESSAGE.fields_by_name['heart_beat'])
+_KVMESSAGE.fields_by_name['heart_beat'].containing_oneof = _KVMESSAGE.oneofs_by_name['kv_message']
 DESCRIPTOR.message_types_by_name['PutRequest'] = _PUTREQUEST
 DESCRIPTOR.message_types_by_name['GetRequest'] = _GETREQUEST
 DESCRIPTOR.message_types_by_name['CordResponse'] = _CORDRESPONSE
@@ -542,6 +626,8 @@ DESCRIPTOR.message_types_by_name['ReplicaRequest'] = _REPLICAREQUEST
 DESCRIPTOR.message_types_by_name['ErrorMessage'] = _ERRORMESSAGE
 DESCRIPTOR.message_types_by_name['ReadRepair'] = _READREPAIR
 DESCRIPTOR.message_types_by_name['HintedHandoff'] = _HINTEDHANDOFF
+DESCRIPTOR.message_types_by_name['DisplayKV'] = _DISPLAYKV
+DESCRIPTOR.message_types_by_name['HeartBeat'] = _HEARTBEAT
 DESCRIPTOR.message_types_by_name['KVMessage'] = _KVMESSAGE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -600,6 +686,20 @@ HintedHandoff = _reflection.GeneratedProtocolMessageType('HintedHandoff', (_mess
   # @@protoc_insertion_point(class_scope:HintedHandoff)
   ))
 _sym_db.RegisterMessage(HintedHandoff)
+
+DisplayKV = _reflection.GeneratedProtocolMessageType('DisplayKV', (_message.Message,), dict(
+  DESCRIPTOR = _DISPLAYKV,
+  __module__ = 'kv_pb2'
+  # @@protoc_insertion_point(class_scope:DisplayKV)
+  ))
+_sym_db.RegisterMessage(DisplayKV)
+
+HeartBeat = _reflection.GeneratedProtocolMessageType('HeartBeat', (_message.Message,), dict(
+  DESCRIPTOR = _HEARTBEAT,
+  __module__ = 'kv_pb2'
+  # @@protoc_insertion_point(class_scope:HeartBeat)
+  ))
+_sym_db.RegisterMessage(HeartBeat)
 
 KVMessage = _reflection.GeneratedProtocolMessageType('KVMessage', (_message.Message,), dict(
   DESCRIPTOR = _KVMESSAGE,

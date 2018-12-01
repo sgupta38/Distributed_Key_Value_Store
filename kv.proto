@@ -56,6 +56,14 @@ message HintedHandoff{
     double timestamp = 3; 
 }
 
+message DisplayKV{
+    bool status = 1;
+}
+
+message HeartBeat{          // Used to check whether 'Node' is offline/online
+    bool status = 1; 
+}
+
 message KVMessage {
   oneof kv_message {
     PutRequest put_request = 1;
@@ -64,5 +72,7 @@ message KVMessage {
     ReplicaRequest replica_request = 4;
     ReplicaResponse replica_response = 5;
     ErrorMessage error_message = 6;
+    DisplayKV display_kvstore = 7;  // User friendly message for displaying KV on comsole.
+    HeartBeat heart_beat = 8;
   }
 }
