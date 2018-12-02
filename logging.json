@@ -34,13 +34,13 @@
   "loggers":
   {
   		"replica":{
-			"level": "DEBUG",
+			"level": "INFO",
 			"handlers": ["replica_file"],
 			"propagate": "no"
 		},
 			
 		"client":{
-			"level": "DEBUG",
+			"level": "INFO",
 			"handlers": ["client_file"],
 			"propagate": "no"
 		}
