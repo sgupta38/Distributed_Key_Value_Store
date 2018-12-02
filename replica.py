@@ -69,7 +69,7 @@ def parseFile(filename):
         replica_info = []
         f = open(filename)
         values = f.read().split()
-        print('values are: ' + str(values))
+        logger.debug('values are: %s', str(values))
         i=0
         while i != len(values):
             replica_info.append(values[i+1])
@@ -137,16 +137,17 @@ def InitializeKVStore():
                 logger.debug("Previous KV store was : " + str(key_value_store))
         else:
             logger.debug("KV file does not exists. Creating..")
-            open(KV_FILE, 'w')
-            key_value_store = {}
-            s = f.write(str(key_value_store))
+            with open(KV_FILE, 'w') as f:
+                key_value_store = {}
+                s = f.write(str(key_value_store))
     except SyntaxError:
-        logger.error('Please DELETE old DB file.')
+        logger.debug('Please DELETE old DB file.')
         print('Error: Please DELETE old DB file.')
     except ValueError:
-        logger.error('Please DELETE old DB file.')
+        debug('Please DELETE old DB file.')
         print('Error: Please DELETE old DB file.')
     except:
+        logger.exception('Some Internal Error Occured while initilising KV STORE')
         print('Some Internal Error Occured while initilising KV STORE')
 
     logger.debug('InitializeKVStore() exit')
@@ -378,7 +379,7 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                     data = sock.recv(BUFFER_SIZE)
                     sock.close()
                 except:
-                    logger.error('Error while connecting. Trying next to connect next replica')
+                    logger.debug('Error while connecting. Trying next to connect next replica')
                     sock.close()
                     # Add id to failed node list
                     hinted_list.append(ID)
@@ -452,7 +453,7 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                 logger.debug('QUORUM rules are not satisfied')
                 ## If Quorum rule is not satisfied, we should not store any 'hints'
                  # Thus 
-                send_errmsg_to_client(client_conn, 'Exception: Not Enough Replica Available')
+                send_errmsg_to_client(client_conn, 'Not Enough Replica Available')
 
         if op_type == GET:
 
@@ -486,7 +487,8 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
                 repair_failed_replicas(kvlist_of_tuple)
 
     except KeyError:
-        logger.error('Invalid Replica Name. Please check replicas.txt')
+        logger.debug('Invalid Replica Name. Please check replicas.txt')
+        print('Invalid Replica Name. Please check replicas.txt')
     except:
         logger.exception('Some Internal Error occured')
 
@@ -647,7 +649,7 @@ def handle_QUORUM_approach(client_conn, request, op_type): # QUORUM
                 sock.close()
                 replica_availability = replica_availability + 1
             except:
-                logger.error('Error while connecting. Trying next to connect next replica')
+                logger.debug('Error while connecting. Trying next to connect next replica')
                 sock.close()
                 ## Failure connect replica means its not 'Alive'. Thus, simply remove from partioner_list.
                 #partioner_list.remove(ID)
@@ -658,7 +660,7 @@ def handle_QUORUM_approach(client_conn, request, op_type): # QUORUM
         eventually_update_replicas(client_conn, partioner_list, request, CONSISTENCY_LEVEL_QUORUM, op_type)
     else:
         logger.debug('Quorum Criteria Not Satisfied. Replica available = %d', replica_availability)
-        send_errmsg_to_client(client_conn, 'Exception: Not Enough Replica Available')
+        send_errmsg_to_client(client_conn, 'Not Enough Replica Available')
 
     logger.debug('handle_QUORUM_approach() exit')
 
@@ -769,7 +771,6 @@ if __name__ == '__main__':
                 logger.debug('put_request() exit')
 
             elif kv_message.HasField('replica_request'):
-                global hint_dict
                 logger.debug('replica_request() entry')
 
                 logger.debug('Hint dictionary : %s',str(hint_dict)) 
@@ -848,14 +849,14 @@ if __name__ == '__main__':
                 print('KV Store: ')
                 print('{')
                 for key in key_value_store:
-                    print( ' ' + key + ':' + str(key_value_store[key]))
+                    print( '     ' + key + ':' + str(key_value_store[key]))
                 print('}')
                 print(' ')
                 print('==============================================================')
 
                 logger.debug('display_kvstore exit()')
             else:
-                print('Invalid Message received.')
+                #print('Invalid Message received.')
                 logger.debug("Invalid Message received.")
 
     except KeyboardInterrupt:
