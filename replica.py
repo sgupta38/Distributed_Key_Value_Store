@@ -492,6 +492,11 @@ def eventually_update_replicas(client_conn, partioner_list, request, approach, o
     except:
         logger.exception('Some Internal Error occured')
 
+    ## if hh_list count is 3. It means all replicas are not available. Reply to client with Error.
+    if len(hinted_list) == 3:
+        logger.debug('All respective replicas are down. Sending error to client.')
+        send_errmsg_to_client(client_conn, 'Error: All replicas are down.')
+
     logger.debug('Configuration type: %d', configuration)
     logger.debug('Final writer_count: %d', write_counter)
     logger.debug('Final read_count: %d', read_counter)
@@ -713,6 +718,7 @@ if __name__ == '__main__':
 
     logger.debug('\nListening on %s:%s\n', str(ip), sys.argv[2])
     print('\n Listening on ' + str(ip) + ' : '+ sys.argv[2])
+    print('\n I am ' + getCurentReplicaID())
     try:
         while True:
             kv_message = kv_pb2.KVMessage()
